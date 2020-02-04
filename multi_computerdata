@@ -1,0 +1,20 @@
+
+ComputerData <- read.csv (choose.files())
+
+attach(ComputerData)
+
+str(ComputerData)
+
+summary(ComputerData)
+
+pairs(ComputerData)
+
+#Correlation Coefficient matrix - Strength & Direction of Correlation
+
+comp <- lm(price ~ speed + hd + ram + screen + ads + trend + cd + multi + premium, data = ComputerData)
+summary(comp)
+
+comp1 <- lm(price ~ ., data = ComputerData)
+summary(comp1)
+
+R value for the model comp and comp1 is little bit same. And the coefficient for all the variables are significant.
