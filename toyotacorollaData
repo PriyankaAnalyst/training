@@ -1,0 +1,52 @@
+library(corpcor)
+
+Toyota<-read.csv(file.choose())
+
+cor(Toyota)
+
+str(Toyota)
+
+summary(Toyota)
+
+Toyota1 <- Toyota[-c(1,2,5,6,10,11,13,15,16,18,20,22,23,24,27,29,31,32,33,35,36,37,38)]
+
+
+Toyota1<-Toyota[c("Price","Age_08_04","KM","HP","cc","Doors","Gears","Quarterly_Tax","Weight")]
+
+attach(Toyota1)
+
+cor(Toyota1)
+
+pairs(Toyota1)
+
+library(car)
+library(corpcor)
+m1<-lm(Price~Age_08_04+KM+HP+cc+Doors+Gears+Quarterly_Tax+Weight,data=Toyota1)
+summary(m1)
+
+
+#R_square value >0.8, but coefficientsdoors and cc are not significant.
+
+cor(Doors,Price)
+[1] 0.1853255
+
+m_door<-lm(Price~Doors)
+
+summary(m_door)
+
+influenceIndexPlot(m_door)
+m_cc<-lm(Price~cc)
+summary(m_cc)
+
+influence.measures(m1)
+
+influenceIndexPlot(m1)
+
+m2<-lm(Price~Age_08_04+KM+HP+cc+Doors+Gears+Quarterly_Tax+Weight,data=Toyota1,-c(81,222))
+summary(m2)
+
+#After altering influencing variable door coefficient is not getting significant, delete door colomn
+
+m3<-lm(Price~Age_08_04+KM+HP+cc+Gears+Quarterly_Tax+Weight,data=Toyota1,-c(81,222))
+
+summary(m3)
