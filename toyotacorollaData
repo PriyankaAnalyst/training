@@ -50,3 +50,5 @@ summary(m2)
 m3<-lm(Price~Age_08_04+KM+HP+cc+Gears+Quarterly_Tax+Weight,data=Toyota1,-c(81,222))
 
 summary(m3)
+
+#Final model, r-square is greater than 0.8 and coefficients are significant.
