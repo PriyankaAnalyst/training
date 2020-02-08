@@ -1,0 +1,28 @@
+
+startup <- read.csv (choose.files())
+#View(data_set)
+attach(startup)
+summary(startup)
+
+pairs(startup)
+
+#Correlation Coefficient matrix - Strength & Direction of Correlation
+
+startup[4]<-NULL
+
+#View(startup)
+
+cor(startup)
+
+### Partial Correlation matrix - Pure Correlation between the varibles
+install.packages("corpcor")
+library(corpcor)
+cor2pcor(cor(startup))
+
+
+# The MultiLinear Model
+
+model.profit <- lm(startup$Profit ~ startup$Administration + startup$Marketing.Spend + startup$R.D.Spend, data=startup)
+summary(model.profit)
+
+plot(model.profit)
