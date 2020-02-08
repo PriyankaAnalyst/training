@@ -1,0 +1,54 @@
+#1) Calories_consumed-> predict weight gained using calories consumed
+
+
+CaloriesData <- read.csv(choose.files())
+attach(CaloriesData)
+
+str(CaloriesData)
+
+summary(CaloriesData)
+
+plot(CaloriesData$Weight.gained..grams.,CaloriesData$Calories.Consumed)
+
+weight <- CaloriesData$Weight.gained..grams.
+calories <- CaloriesData$Calories.Consumed
+
+#correlation coeff r
+
+cor(weight,calories) #0.946991 | R is 1
+
+#simple linear regression
+
+reg<-lm(calories~weight) # lm(Y ~ X)
+
+summary(reg) #R-squared: 0.8968
+
+
+#prediction model
+
+pred <- predict(reg,interval = "predict") 
+pred
+#PVALUE IS less than 0.05 so we can use B0 and B1
+
+a<- confint(reg,level = 0.95)
+a
+
+# Trying to do better R sqaure value model
+
+reg1<-lm(weight~log(Calories.Consumed))  # Using logarthmic transformation
+
+summary(reg1)  # R-squared value is 0.8077
+
+a1<- confint(reg1,level = 0.95)
+a1
+
+#prediction model
+
+pred1 <- predict(reg1,interval = "predict") 
+pred1
+
+#Final Model where we can go with "simple linear regression* with R-squared: 0.8968
+#We can accept the final value.
+
+#2) Delivery_time -> Predict delivery time using sorting time 
+
