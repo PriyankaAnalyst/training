@@ -1,0 +1,78 @@
+ONE:
+1) Extract tweets for any user (try choosing a user who has more tweets)
+2) Perform sentimental analysis on the tweets extracted from the above
+*******************************************************************************************
+
+install.packages("SnowballC")
+install.packages("tm")
+install.packages("twitteR")
+install.packages("syuzhet")
+install.packages("ROAuth")
+install.packages("base64enc")
+install.packages("httpuv")
+
+library("SnowballC")
+library("tm")
+library("twitteR")
+library("syuzhet")
+library("ROAuth")
+library("base64enc")
+library("httpuv")
+library("tidytext")
+
+
+# Authorization keys
+
+consumer_key <- 'MGzRL7gszH8yejAVE5DIhWdqi'
+consumer_secret <- 'MgFbFJ2lqCqPiflH9GGnC12zdlcYTxpxUk7dTRcCQh1cD0QO23'
+access_token <- '2319396519-hU6PuNxiDtOJjTvmReBFp5AeC6QIgbdPpneEwKt'
+access_secret <- 'pOMWSbYrIYD6Q9U5nBzdlKNIGBX9GG1gOBrGPmne86RIT'
+
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+
+
+tweets <- userTimeline("deepikapadukone", n=100, includeRts = F)
+
+
+Tweetsdf <- twListToDF(tweets) 
+
+write.csv(Tweetsdf, "Tweets.csv")
+
+getwd()
+
+"*************** Sentimates Analysis And Emotion Mining **********************/"
+
+tweets_text <- readLines(choose.files())
+
+tweets_text[1:4]
+tweets_text[5:12]
+senti <- get_nrc_sentiment(tweets_text[1:20])
+head(senti, n=5)
+
+get_nrc_sentiment("Chhapaak")
+get_nrc_sentiment("crushed")
+
+"******* Bar plot for emotion mining ****** "
+
+
+barplot(colSums(senti), las=2, col = rainbow(10), ylab = 'count', main = "Emotion Score")
+
+"******* Plot trajactory ****** "
+sen_vec <- get_sentences(tweets_text[1:20])
+sentiment_vector <- get_sentiment(sen_vec, method = "afinn")
+head(sentiment_vector)
+
+?get_sentiment
+
+plot( sentiment_vector, type="l", main="Example Plot Trajectory", xlab = "Narrative Time", ylab= "Emotional Valence")
+
+"******* Extract most negative and positive sentence***** "
+
+negative <- sen_vec[which.min(sentiment_vector)]
+negative
+
+positive <- sen_vec[which.max(sentiment_vector)]
+positive
+
+"********************************************"
+ 
