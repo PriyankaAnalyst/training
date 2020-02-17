@@ -1,0 +1,154 @@
+install.packages("RSentiment")
+install.packages("xlsx")
+install.packages("rvest")
+install.packages("XML")
+
+
+install.packages("SnowballC")
+install.packages("wordcloud")
+install.packages("RWeka")
+install.packages("qdap")
+install.packages("textir")
+install.packages("igraph")
+install.packages("maptpx")
+
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RWeka)
+library(qdap)
+library(textir)
+library(igraph)
+library(maptpx)
+library(rJava)
+
+library(rvest)
+library(XML)
+library(magrittr)
+library(tidytext)
+
+############### Amazon Reviews extraction #######################
+
+aurl<-"https://www.amazon.in/Titan-Analog-Grey-Womens-Watch-2569KM03/product-reviews/B0768Z2WL1/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews"
+
+amazon_reviews <- NULL
+
+for (i in 1:50){
+  murl <- read_html(as.character(paste(aurl,i,sep="=")))
+  rev <- murl %>%
+    html_nodes(".review-reviews") %>%
+    html_text()
+  amazon_reviews <- c(amazon_reviews,rev)
+}
+write.table(amazon_reviews,"watch_ratings.txt",row.names = F)
+
+
+#extracting data from text file. 
+
+x=readLines(file.choose())  #watch_reviews.txt
+length(x)
+data_review <- as.character(x)
+class(data_review)
+
+data_review1 <- stemDocument(data_review)
+
+#corpus is collection of documents
+
+x1= Corpus(VectorSource(data_review1)) #constructs a source for vector as input
+
+?tm_map
+x1<-tm_map(x1,stripWhitespace)
+x1<- tm_map(x1,tolower)
+
+x1<-tm_map(x1,removeNumbers)
+
+x1<-tm_map(x1,removeWords,c(stopwords('english')))
+
+x1<-tm_map(x1,removePunctuation)
+x1<-tm_map(x1,removeWords, c('and','the','our','that'))
+
+tdm_x1<-TermDocumentMatrix (x1) 
+TDM1<-as.matrix(tdm_x1)
+v = sort(rowSums(TDM1), decreasing = TRUE)
+summary(v)
+
+wordcloud (x1, scale=c(2,0.5), max.words=50, random.order=FALSE, rot.per=0.35, use.r.layout=FALSE, colors=brewer.pal(4, 'Dark2'))
+################################3
+
+#POSITIVE WORDCLOUD and negative word cloud
+
+
+library(wordcloud)
+makeword_coud<-function(x1){
+  freq <- sort(rowSums(as.matrix(x1)),decreasing = TRUE)
+  freq.df<- data.frame(word= names(freq),freq)
+  wordcloud(freq.df$word[1:120],freq.df$freq[1:120],colors = 1:10,scale = c(4,0.5) )
+}
+
+
+
+makePositivewordcloud<-function(x1){
+  freq<-sort(rowSums(as.matrix(x1)),decreasing = TRUE)
+  pos.matches<-match(names(freq),pos.words)
+  pos.matches<-!is.na(pos.matches)
+  freq_pos<-freq[pos.matches]
+  names<-names(freq_pos)
+  wordcloud(names,freq_pos,scale = c(4,0.5),colors = 1:10)
+}
+library(ggplot2)
+?sort
+?names
+?match
+?freq
+
+
+
+makeNegetiveWordCloud<-function(x1){
+  freq<-sort(rowSums(as.matrix(x1)),decreasing = TRUE)
+  Neg.matches<-match(names(freq),(neg.words))
+  Neg.matches<-!is.na(Neg.matches)
+  freq_neg<-freq[Neg.matches]
+  names<-names(freq_neg)
+  wordcloud(names,freq_neg,scale = c(4,0.5),colors = 1:10)
+}
+
+clusterword<-function(x1){
+  freq<-sort(rowSums(as.matrix(x1)),decreasing = TRUE)
+  +   freq_names<-data.frame(word=names(freq),freq)
+  +   ggplot(head(freq_names,20),aes(reorder(word,freq),freq))+ geom_bar(stat = "identity")
+}
+
+tdf0<-TermDocumentMatrix(x1)
+inspect(tdf0)
+
+tdf1<-TermDocumentMatrix(x1,control = list(weighting=function(p)weightTfIdf(p,normalize = F)))
+inspect(tdf1)
+
+inspect(tdm_x1)
+a0=NULL
+a1=NULL> for (i in 1:ncol(tdf0)) {  if(sum(tdf0[,i])==0){a0<-c(a0,i)}
+}
+for (i in 1:ncol(tdf1)) {
+  if(sum(tdf1[,i])==0){a1<-c(a1,i)}
+}
+
+
+pos.words<-scan(file.choose(), what ="character", comment.char=";")
+neg.words<-scan(file.choose(), what ="character", comment.char=";")
+
+tdf0<-tdf0[,-a0]
+tdf1<-tdf1[,a1]
+
+library(rJava)
+library(RWeka)
+library(moments)
+library(textir)
+library(igraph)
+library(qdap)
+library(maptpx)
+library(Matrix)
+
+makeword_coud(tdf0)
+makePositivewordcloud(tdf0)
+makeNegetiveWordCloud(tdf0)
+
