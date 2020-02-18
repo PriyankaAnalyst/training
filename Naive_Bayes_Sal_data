@@ -1,0 +1,105 @@
+
+install.packages("naivebayes")
+install.packages("caret")
+install.packages("psych")
+install.packages("e1071")
+
+library(naivebayes)
+library(ggplot2)
+library(caret)
+library(psych)
+library(e1071)
+
+sal_train <- read.csv(file.choose())
+str(sal_train)
+
+
+sal_train$educationno <- as.factor(sal_train$educationno)
+
+View(sal_train)
+
+class(sal_train)
+
+# Plot and ggplot 
+
+#age of a person workclass
+
+ggplot(data=sal_train,aes(x=sal_train$Salary, y = sal_train$age, fill = sal_train$Salary)) +
+  geom_boxplot() + ggtitle("Box Plot")
+
+#A work class is a grouping of work education	
+
+plot(sal_train$workclass,sal_train$Salary)
+
+#Education of an individuals
+
+plot(sal_train$education,sal_train$Salary)
+
+#Marital status of an individuals
+
+plot(sal_train$maritalstatus,sal_train$Salary)
+
+plot(sal_train$educationno,sal_train$Salary)
+
+#occupation of an individuals
+
+plot(sal_train$occupation,sal_train$Salary)
+
+#relationship 
+
+plot(sal_train$relationship,sal_train$Salary)
+
+#Race of an Individual
+
+plot(sal_train$race,sal_train$Salary)
+
+#Gender of an Individual
+
+plot(sal_train$sex,sal_train$Salary)
+
+#capitalgain --  profit received from the sale of an investment	capital
+
+ggplot(data=sal_train,aes(x=sal_train$Salary, y = sal_train$capitalgain, fill = sal_train$Salary)) +
+  geom_boxplot() +  ggtitle("Box Plot")
+
+#A decrease in the value of a capital
+
+ggplot(data=sal_train,aes(x=sal_train$Salary, y = sal_train$capitalloss, fill = sal_train$Salary)) +
+  geom_boxplot() + ggtitle("Box Plot")
+
+#number of hours work per week
+
+ggplot(data=sal_train,aes(x=sal_train$Salary, y = sal_train$hoursperweek, fill = sal_train$Salary)) +
+  geom_boxplot() + ggtitle("Box Plot")
+
+#Native of an individual
+
+plot(sal_train$native,sal_train$Salary)
+
+#salary of an individual
+
+
+ggplot(data=sal_train,aes(x = sal_train$age, fill = sal_train$Salary)) +
+  geom_density(alpha = 0.9, color = 'blue')
+
+#Naive Bayes Model
+
+NB <- naiveBayes(sal_train$Salary ~ ., data = sal_train)
+NB
+
+#prediction model
+
+sal_test <- read.csv(file.choose())
+str(sal_test)
+
+sal_test$educationno <- as.factor(sal_test$educationno)
+
+str(sal_test)
+
+pred <- predict(NB,sal_test)
+pred
+
+mean(pred==sal_test$Salary)
+
+confusionMatrix(pred,sal_test$Salary)
+
