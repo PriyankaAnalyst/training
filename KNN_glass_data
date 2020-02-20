@@ -1,0 +1,77 @@
+
+library(caTools)
+library(dplyr)
+library(ggplot2)
+library(caret)
+library(class)
+library(corrplot)
+
+glass <- read.csv(choose.files(), col.names=c("RI","Na","Mg","Al","Si","K","Ca","Ba","Fe","Type"))
+
+standard.features <- scale(glass[,1:9])
+
+
+data <- cbind(standard.features,glass[10])
+
+#Check if there are any missing values to impute. 
+anyNA(data)
+
+head(data)
+
+#data visualization
+corrplot(cor(data))
+
+#train and test data
+
+set.seed(101)
+
+sample <- sample.split(data$Type,SplitRatio = 0.70)
+
+train <- subset(data,sample==TRUE)
+
+test <- subset(data,sample==FALSE)
+
+predicted.type <- knn(train[1:9],test[1:9],train$Type,k=1)
+
+
+#Error in prediction
+error <- mean(predicted.type!=test$Type)
+
+
+glass$RI<-as.factor(glass$RI)
+glass$Na<-as.factor(glass$Na)
+glass$Mg<-as.factor(glass$Mg)
+glass$Al<-as.factor(glass$Al)
+glass$Si<-as.factor(glass$Si)
+glass$K<-as.factor(glass$K)
+glass$Ca<-as.factor(glass$Ca)
+glass$Ba<-as.factor(glass$Ba)
+glass$Fe<-as.factor(glass$Fe)
+glass$Type<-as.factor(glass$Type)
+
+#Confusion Matrix
+confusionMatrix(predicted.type,test$Type) # accuracy is 70%
+
+#Lets try with different K value to get better accuracy.
+
+predicted.type <- NULL
+error.rate <- NULL
+
+for (i in 1:10) {
+  predicted.type <- knn(train[1:9],test[1:9],train$Type,k=i)
+  error.rate[i] <- mean(predicted.type!=test$Type)
+  
+}
+
+knn.error <- as.data.frame(cbind(k=1:10,error.type =error.rate))
+
+
+#plot for error and K value to check which value would be the best to analyse.
+
+ggplot(knn.error,aes(k,error.type))+ geom_point()+ geom_line() + scale_x_continuous(breaks=1:10)+ 
+  theme_bw() + xlab("Value of K") + ylab('Error')
+
+#as per the graph, the error is at low level on k=1 and other at the highest, So the predictions
+# we have done is the best & better.
+
+#Accuracy is 70%
