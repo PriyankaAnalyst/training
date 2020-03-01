@@ -1,0 +1,104 @@
+#Let’s consider a Company dataset with around 10 variables and 400 records. 
+
+install.packages("C50")
+install.packages("tree")
+install.packages("rpart.plot")
+
+
+library(caret)
+library("rpart")
+library("rpart")
+
+library(C50)
+library(tree)
+library(gmodels)
+
+compdata <- read.csv(choose.files())
+
+colnames(compdata)
+
+Sales_Result <- NULL
+Sales_Result <- ifelse(compdata$Sales > 7.490,1,0)
+compdata[,"Sales_Result"] <- Sales_Result
+
+#converting to factors
+
+compdata$ShelveLoc <- as.factor(compdata$ShelveLoc)
+compdata$Urban <- as.factor(compdata$Urban)
+compdata$US <- as.factor(compdata$US)
+compdata$Sales_Result <- as.factor(compdata$Sales_Result)
+
+sales_high <- compdata[compdata$Sales_Result == "1",] 
+sales_low <- compdata[compdata$Sales_Result == "0",]
+
+#Train and test data for analysis
+
+data_train <- rbind(sales_high[1:150,], sales_low[1:150,])
+data_test <- rbind(sales_high[151:199,], sales_low[151:201,])
+
+#decision tree
+
+trained_model <- C5.0(data_train[,-c(12)], data_train$Sales_Result)
+
+rpart.plot(trained_model)
+
+
+mean(data_train$Sales_Result == predict(trained_model, data_train))
+
+#prediction test / analysis
+
+pred_test <- predict(trained_model, newdata = data_test)
+
+mean(pred_test == data_test$Sales_Result)
+
+CrossTable(data_test$Sales_Result, pred_test)
+
+#confusion matrix
+
+confusionMatrix(data_test$Sales_Result, pred_test)
+
+
+#Use decision trees to prepare a model on fraud data treating those who have taxable_income <= 30000 as "Risky" and others are "Good"
+
+
+library("C50")
+library(gmodels)
+
+FraudCheck <- read.csv(file.choose())
+
+Risky <- NULL
+Risky <- ifelse(FraudCheck$Taxable.Income<=30000,1,0)
+
+FraudCheck[,"Risky"] <- Risky
+
+FraudCheck$Undergrad <- as.factor(FraudCheck$Undergrad)
+FraudCheck$Marital.Status <- as.factor(FraudCheck$Marital.Status)
+FraudCheck$Urban <- as.factor(FraudCheck$Urban)
+FraudCheck$Risky <- as.factor(FraudCheck$Risky)
+
+fraud_risky <- FraudCheck[FraudCheck$Risky == "1",] 
+fraud_not_risky <- FraudCheck[FraudCheck$Risky == "0",]
+
+data_train <- rbind(fraud_risky[1:93,], fraud_not_risky[1:357,])
+data_test <- rbind(fraud_risky[94:124,], fraud_not_risky[358:476,])
+
+#decision tree model
+
+trained_model <- C5.0(data_train[,-c(7)], data_train$Risky)
+plot(trained_model)
+
+mean(data_train$Risky == predict(trained_model, data_train))
+
+#prediction analysis
+
+pred_test <- predict(trained_model, newdata = data_test)
+
+mean(pred_test == data_test$Risky)
+
+CrossTable(data_test$Risky, pred_test)
+
+#confusion matrix for accuracy
+
+confusionMatrix(data_test$Risky, pred_test)
+
+#This is the perfect model at the accuracy of 1.
