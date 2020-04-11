@@ -1,0 +1,173 @@
+**********************************************************
+Prepare rules for the all the data sets  - Books and Movies Dataset
+1) Try different values of support and confidence. Observe the change in number of rules for different support,confidence values
+2) Change the minimum length in apriori algorithm
+3) Visulize the obtained rules using different plots 
+***********
+1) Books DataSet
+
+install.packages("arules")
+install.packages("arulesViz")
+
+library("arules")
+library("arulesViz")
+
+book <- read.csv(file.choose())
+
+View(book)
+
+?apriori
+
+rules <- apriori(as.matrix(book),parameter=list(support=0.0250, confidence = 0.68,minlen=4))
+
+rules1 <- apriori(as.matrix(book),parameter=list(support=0.02, confidence = 0.5,minlen=5))
+
+rules2 <- apriori(as.matrix(book),parameter=list(support=0.024, confidence = 0.66,minlen=2))
+
+rules3 <- apriori(as.matrix(book),parameter=list(support=0.028, confidence = 0.95,minlen=2))
+
+rules4 <- apriori(as.matrix(book),parameter=list(support=0.025, confidence = 0.92,minlen=3))
+
+# Provided the rules with 2 % Support, 50 % Confidence and Minimum to purchase 
+# 5 books 
+
+rules
+rules1
+rules2
+rules3
+rules4
+
+
+inspect(head(sort(rules, by = "lift")))  
+inspect(head(sort(rules1, by = "lift")))
+inspect(head(sort(rules2, by = "lift")))
+inspect(head(sort(rules3, by = "lift")))
+inspect(head(sort(rules4, by = "lift")))
+
+head(quality(rules))
+head(quality(rules1))
+head(quality(rules2))
+head(quality(rules3))
+head(quality(rules4))
+
+#Rules
+
+plot(rules,method = "scatterplot")
+
+plot(rules,method = "grouped")
+
+plot(rules,method = "graph")
+
+# The ItalArt books are being sold at a larger extent along with other Cook, art, geo, child books
+# Cook books are also being sold at a larger extent along with other child, art, geo, Doit books)
+
+#Rules1
+
+plot(rules1,method = "scatterplot")
+
+plot(rules1,method = "grouped")
+
+plot(rules1,method = "graph")
+
+# The ItalArt books are being sold at a larger extent with ItalCook
+
+#Rules2
+
+plot(rules2,method = "scatterplot")
+
+plot(rules2,method = "grouped")
+
+plot(rules2,method = "graph")
+
+# The ItalCook books are being sold at a larger extent with ItalArt and Cookbks
+
+#Rules3
+
+plot(rules3,method = "scatterplot")
+
+plot(rules3,method = "grouped")
+
+plot(rules3,method = "graph")
+
+# The ItalAtlas books are being sold at a larger extent with RefBks and Cookbks, childBks Books
+
+#Rules4
+
+plot(rules4,method = "scatterplot")
+
+plot(rules4,method = "grouped")
+
+plot(rules4,method = "graph")
+
+# The ItalAtlas books are being sold at a larger extent with RefBks and Cookbks, childBks Books
+ 
+#*****************************************************************************#
+
+2) Movies DataSet
+
+library(arules)
+
+mymovies <- read.csv(file.choose())
+
+
+rules <- apriori(as.matrix(mymovies[,6:15],parameter=list(support=0.2, confidence = 0.5,minlen=5)))
+
+# Provided the rules with 2% Support, 50 % Confidence and watched a minimum of 5 movies
+
+rules1 <- apriori(as.matrix(mymovies[,8:15],parameter=list(support=0.1, confidence = 0.1,minlen=3)))
+rules2 <- apriori(as.matrix(mymovies[,10:15],parameter=list(support=0.2, confidence = 0.1,minlen=2)))
+rules3 <- apriori(as.matrix(mymovies[,7:15],parameter=list(support=0.2, confidence = 0.1,minlen=4)))
+
+
+rules
+rules1
+rules2
+rules3
+
+inspect(head(sort(rules, by = "lift"))) 
+inspect(head(sort(rules1, by = "lift"))) 
+inspect(head(sort(rules2, by = "lift"))) 
+inspect(head(sort(rules3, by = "lift"))) 
+
+head(quality(rules))
+head(quality(rules1))
+head(quality(rules2))
+head(quality(rules3))
+
+#Rules
+plot(rules,method = "scatterplot")
+plot(rules, method = "grouped")
+plot(rules,method = "graph")
+
+# It looks ike most of them has watched LOTR movies along with Harry Potter2
+# Also most of them has watched Harry Potter2, Patriot with Braveheart.
+# Patriot ,Braveheart and other three items along with Harry Potter2. 
+
+#Rules1
+plot(rules1,method = "scatterplot")
+plot(rules1, method = "grouped")
+plot(rules1,method = "graph")
+
+# It looks ike most of them has watched LOTR movies along with Harry Potter2
+# Also most of them has watched Harry Potter2, Patriot with Braveheart.
+# Patriot ,Braveheart and other three items along with Harry Potter2. 
+
+
+#Rules2
+plot(rules2,method = "scatterplot")
+plot(rules2, method = "grouped")
+plot(rules2,method = "graph")
+
+# It looks ike most of them has watched LOTR movies along with GreenMile
+# Also most of them has watched Patriot with Braveheart.
+
+
+#Rules3
+plot(rules3,method = "scatterplot")
+plot(rules3, method = "grouped")
+plot(rules3,method = "graph")
+
+# It looks ike most of them has watched LOTR movies along with GreenMile,
+# Harry Potter2, Patriot and Braveheart 
+
+
